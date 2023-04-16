@@ -69,8 +69,8 @@ class DeterministicEncoder(nn.Module):
         self.cross_attentions = nn.ModuleList([Attention(num_hidden) for _ in range(n_CA)])
         self.self_attentions= nn.ModuleList([Attention(num_hidden) for _ in range(n_SA)])
         self.input_projection = Linear(input_dim, num_hidden)
-        self.context_projection = Linear(2048, num_hidden)
-        self.target_projection = Linear(2048, num_hidden)
+        self.context_projection = Linear(1024, num_hidden)
+        self.target_projection = Linear(1024, num_hidden)
 
     def forward(self, context_x, context_y, target_x):
         # project vector with dimension n_bins(context_y) --> num_hidden
@@ -102,7 +102,7 @@ class Decoder(nn.Module):
     def __init__(self, num_hidden, use_latent_path):
         super().__init__()
 
-        self.target_projection = Linear(2048, num_hidden)
+        self.target_projection = Linear(1024, num_hidden)
 
         if use_latent_path:
             self.linears = nn.ModuleList([Linear(num_hidden * 3, num_hidden * 3, w_init='relu') for _ in range(3)])

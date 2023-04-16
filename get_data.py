@@ -5,7 +5,7 @@ import wget
 
 def data_download():
     # test_coo.pkl
-    data_path = './data'
+    data_path = './data/BindingDB'
     if not os.path.exists(data_path):
         os.makedirs(data_path)
 

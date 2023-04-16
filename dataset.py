@@ -4,6 +4,7 @@ import numpy as np
 import torch
 from torch.utils.data import Dataset
 from torch.nn.utils.rnn import pad_sequence
+import sys
 
 
 def get_score_binning(mu_arr, sigma, n_bins):
@@ -25,16 +26,22 @@ def get_score_binning(mu_arr, sigma, n_bins):
     return count
 
 
-def load_data():
-    DATA_PATH = './data'
-    with open(os.path.join(DATA_PATH, 'train_coo.pkl'), 'rb') as f:
+def load_data(dataset):
+    DATA_PATH = './data/'
+    if dataset == 'fsmol':
+        DATA_PATH+='FSMol'
+    elif dataset == 'bindingdb':
+        DATA_PATH+='BindingDBwithFPs'
+    with open(os.path.join(DATA_PATH, 'train_coo.pickle'), 'rb') as f:
         train_coo = pickle.load(f)
-    with open(os.path.join(DATA_PATH, 'test_coo.pkl'), 'rb') as f:
+    with open(os.path.join(DATA_PATH, 'test_coo.pickle'), 'rb') as f:
         test_coo = pickle.load(f)
+    with open(os.path.join(DATA_PATH, 'valid_coo.pickle'), 'rb') as f:
+        valid_coo = pickle.load(f)
 
     ecfp = np.load(
         os.path.join(DATA_PATH, "total_ecfp.npy"), allow_pickle=True)
-    return train_coo, test_coo, ecfp
+    return train_coo, test_coo, valid_coo, ecfp
 
 
 class MetaDataset(Dataset):
@@ -54,6 +61,10 @@ class MetaDataset(Dataset):
         ligand_num = self.coo_row[train_index]
         ligand_data = self.coo_data[train_index]
         ligand_data_bin = get_score_binning(ligand_data, np.std(ligand_data), self.n_bins)
+
+        print("MAX LIGAND NUMBER")
+        print(max(ligand_num))
+        print(len(self.total_ecfp))
         ecfp = np.array([self.total_ecfp[num] for num in ligand_num])
 
         return {'target': target_num,
